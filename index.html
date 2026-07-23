@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Browse CAPES journal and conference classifications by research area." />
+  <title>CAPES Metrics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="container">
+    <header class="masthead">
+      <div class="eyebrow">Procedimento 2 · Computação 2025–2028</div>
+      <h1>CAPES Metrics</h1>
+      <p class="sub">QUALIS classification of scientific journals and conferences, by research area.</p>
+    </header>
+
+    <section class="stat-grid" aria-label="Dataset summary">
+      <article class="stat-card"><div id="journal-count" class="num">—</div><div class="lbl">Journals</div></article>
+      <article class="stat-card"><div id="conference-count" class="num">—</div><div class="lbl">Conferences</div></article>
+      <article class="stat-card"><div id="area-count" class="num">—</div><div class="lbl">Research areas</div></article>
+      <article class="stat-card"><div id="a1-count" class="num">—</div><div class="lbl">A1 entries</div></article>
+    </section>
+
+    <div id="status" class="status" role="status">Loading CAPES data…</div>
+
+    <nav class="tabs" role="tablist" aria-label="CAPES sections">
+      <button class="tab active" role="tab" aria-selected="true" aria-controls="journals-panel" data-tab="journals-panel">Journals</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="conferences-panel" data-tab="conferences-panel">Conferences</button>
+      <button class="tab" role="tab" aria-selected="false" aria-controls="overview-panel" data-tab="overview-panel">Overview</button>
+    </nav>
+
+    <section id="journals-panel" class="tab-panel active" role="tabpanel">
+      <div class="filter-grid">
+        <input id="journal-search" type="search" placeholder="Name, ISSN or area — comma for multiple" aria-label="Search journals" />
+
+        <div class="multi-select" id="journal-area-filter">
+          <button type="button" class="multi-select-trigger" aria-expanded="false" aria-haspopup="listbox">
+            <span class="multi-select-values"><span class="multi-select-placeholder">All areas</span></span>
+            <span class="multi-select-arrow" aria-hidden="true">⌄</span>
+          </button>
+          <div class="multi-select-menu" hidden>
+            <div class="multi-select-search-wrapper">
+              <input type="search" class="multi-select-search" placeholder="Search areas..." aria-label="Search journal areas" />
+            </div>
+            <div class="multi-select-options" role="listbox" aria-multiselectable="true"></div>
+          </div>
+        </div>
+
+        <div class="multi-select" id="journal-estrato-filter">
+          <button type="button" class="multi-select-trigger" aria-expanded="false" aria-haspopup="listbox">
+            <span class="multi-select-values"><span class="multi-select-placeholder">All estratos</span></span>
+            <span class="multi-select-arrow" aria-hidden="true">⌄</span>
+          </button>
+          <div class="multi-select-menu" hidden>
+            <div class="multi-select-options" role="listbox" aria-multiselectable="true"></div>
+          </div>
+        </div>
+      </div>
+      <p id="journal-caption" class="caption"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Journal</th><th>ISSN</th><th>Percentile</th><th>Estrato</th><th>Areas</th><th>Scopus</th></tr></thead>
+          <tbody id="journal-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="conferences-panel" class="tab-panel" role="tabpanel" hidden>
+      <div class="filter-grid">
+        <input id="conference-search" type="search" placeholder="Name, acronym or area — comma for multiple" aria-label="Search conferences" />
+
+        <div class="multi-select" id="conference-area-filter">
+          <button type="button" class="multi-select-trigger" aria-expanded="false" aria-haspopup="listbox">
+            <span class="multi-select-values"><span class="multi-select-placeholder">All areas</span></span>
+            <span class="multi-select-arrow" aria-hidden="true">⌄</span>
+          </button>
+          <div class="multi-select-menu" hidden>
+            <div class="multi-select-search-wrapper">
+              <input type="search" class="multi-select-search" placeholder="Search areas..." aria-label="Search conference areas" />
+            </div>
+            <div class="multi-select-options" role="listbox" aria-multiselectable="true"></div>
+          </div>
+        </div>
+
+        <div class="multi-select" id="conference-estrato-filter">
+          <button type="button" class="multi-select-trigger" aria-expanded="false" aria-haspopup="listbox">
+            <span class="multi-select-values"><span class="multi-select-placeholder">All estratos</span></span>
+            <span class="multi-select-arrow" aria-hidden="true">⌄</span>
+          </button>
+          <div class="multi-select-menu" hidden>
+            <div class="multi-select-options" role="listbox" aria-multiselectable="true"></div>
+          </div>
+        </div>
+      </div>
+      <p id="conference-caption" class="caption"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Acronym</th><th>Conference</th><th>Estrato</th><th>Areas</th><th>Submission</th><th>Event</th></tr></thead>
+          <tbody id="conference-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="overview-panel" class="tab-panel" role="tabpanel" hidden>
+      <h2>Estrato distribution</h2>
+      <div class="chart-grid"><div id="journal-distribution" class="chart"></div><div id="conference-distribution" class="chart"></div></div>
+      <h2>Coverage by research area</h2>
+      <div class="chart-grid"><div id="journal-areas" class="chart"></div><div id="conference-areas" class="chart"></div></div>
+      <article class="explanation">
+        <h2>How estratos are assigned</h2>
+        <p>For <strong>journals</strong>, the estrato shown is the one computed from the Scopus highest-category percentile, following the CAPES Procedimento 2 bands (A1 ≥ 87.5%, A2 ≥ 75%, A3 ≥ 62.5%, A4 ≥ 50%, A5 ≥ 37.5%, A6 ≥ 25%, A7 ≥ 12.5%, A8 &lt; 12.5%). For <strong>conferences</strong>, the estrato comes from the curated CE-SBC classification (H5-index based, with Top10/Top20 adjustment).</p>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
